@@ -29,8 +29,9 @@
               mdi-information
             </v-icon>
           </template>
-          <span>Only the most popular cities in the world are enabled.</span> <br>
-            <span>More information in: https://www.metaweather.com/</span>
+          <span>Only the most popular cities in the world are enabled.</span>
+          <br />
+          <span>More information in: https://www.metaweather.com/</span>
         </v-tooltip>
       </v-toolbar>
       <div class="pt-16"></div>
@@ -46,15 +47,25 @@
       </p>
 
       <p class="white--text text-size-small">{{ weather_state_name }}</p>
-       <v-icon size="25"  class="mb-2 pt-10" color="grey">mdi-calendar</v-icon>
+      <v-icon size="25" class="mb-2 pt-10" color="grey">mdi-calendar</v-icon>
       <p class="grey--text text-size-xs">Today</p>
-      <p class="white--text text-size-smalll  pb-5">
-        <v-icon size="30"  class="mb-2" color="white">mdi-map-marker</v-icon> {{ title }}
+      <p class="white--text text-size-smalll pb-5">
+        <v-icon size="30" class="mb-2" color="yellow">mdi-map-marker</v-icon>
+        {{ title }}
         {{ location_type }}
       </p>
     </v-card>
     <v-snackbar v-model="snackbar" :timeout="timeout">
       {{ text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
+    <v-snackbar v-model="snackbar2" :timeout="timeout">
+      {{ text2 }}
 
       <template v-slot:action="{ attrs }">
         <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
@@ -69,7 +80,7 @@
 import { mapMutations, mapState } from "vuex";
 import axios from "axios";
 
-//icons 
+//icons
 import iconSnow from "../assets/icons/018-snowfall.svg";
 import iconSleet from "../assets/icons/045-snow.svg";
 import iconHail from "../assets/icons/013-hail.svg";
@@ -87,6 +98,8 @@ export default {
     button: false,
     snackbar: false,
     text: "CITY NOT FOUND",
+    snackbar2: false,
+    text2: "WRITE A CITY",
     timeout: 3000,
   }),
   computed: {
@@ -127,24 +140,28 @@ export default {
   },
   methods: {
     searchWeather() {
-      this.button = true;
-      axios
-        .get(
-          "https://cors-anywhere.herokuapp.com/https://" +
-            "www.metaweather.com/api/location/search/?query=" +
-            this.location
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .toLowerCase()
-        )
-        .then((response) => {
-          if (response.data.length != 0) {
-            this.getWeather(response.data[0].woeid);
-            return;
-          }
-          this.button = false;
-          this.snackbar = true;
-        });
+      if (this.location != '') {
+        this.button = true;
+        axios
+          .get(
+            "https://cors-anywhere.herokuapp.com/https://" +
+              "www.metaweather.com/api/location/search/?query=" +
+              this.location
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()
+          )
+          .then((response) => {
+            if (response.data.length != 0) {
+              this.getWeather(response.data[0].woeid);
+              return;
+            }
+            this.button = false;
+            this.snackbar = true;
+          });
+      } else {
+        this.snackbar2 = true;
+      }
     },
     getWeather(woeid) {
       axios
