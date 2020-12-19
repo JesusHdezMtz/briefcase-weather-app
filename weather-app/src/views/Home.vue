@@ -14,6 +14,10 @@
               </v-row>
               </v-container>
               <v-container class="px-2">
+                <p class="white--text text-size-md font px-5">
+                  <v-icon size="30" color="yellow">mdi-map-marker</v-icon>
+                  Today's highlight
+                </p>
               <v-row class="full-size mx-0">
                  <v-col cols="12" xs="12" sm="12" md="6" lg="6" xl="6" 
                  v-for="(item, i) in cardsOneRow" :key="i">
@@ -73,5 +77,15 @@ export default {
 .full-size{
   width: 100%;
   height: 100%;
+}
+@font-face {
+  font-family: Mazzard;
+  src: url("../assets/MazzardH-SemiBold.ttf");
+}
+.font {
+  font-family: Mazzard;
+}
+.text-size-md {
+  font-size: 30px;
 }
 </style>
