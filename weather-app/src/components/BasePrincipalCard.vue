@@ -17,14 +17,21 @@
         <v-btn
           rounded
           color="white"
-          class="ml-2 black--text"
+          :disabled="button"
+          class="mx-2 black--text"
           @click="searchWeather"
         >
           Search
         </v-btn>
-        <v-btn icon>
-          <v-icon>mdi-crosshairs-gps</v-icon>
-        </v-btn>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon color="white" size="39" dark v-bind="attrs" v-on="on">
+              mdi-information
+            </v-icon>
+          </template>
+          <span>Only the most popular cities in the world are enabled.</span> <br>
+            <span>More information in: https://www.metaweather.com/</span>
+        </v-tooltip>
       </v-toolbar>
       <div class="pt-16"></div>
       <v-img
@@ -39,25 +46,18 @@
       </p>
 
       <p class="white--text text-size-small">{{ weather_state_name }}</p>
+       <v-icon size="25"  class="mb-2 pt-10" color="grey">mdi-calendar</v-icon>
       <p class="grey--text text-size-xs">Today</p>
-      <p class="grey--text text-size-xs pb-5">
-        <v-icon size="18" color="grey">mdi-map-marker</v-icon> {{ title }}
+      <p class="white--text text-size-small  pb-5">
+        <v-icon size="30"  class="mb-2" color="white">mdi-map-marker</v-icon> {{ title }}
         {{ location_type }}
       </p>
     </v-card>
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="timeout"
-    >
+    <v-snackbar v-model="snackbar" :timeout="timeout">
       {{ text }}
 
       <template v-slot:action="{ attrs }">
-        <v-btn
-          color="red"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
+        <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
           Close
         </v-btn>
       </template>
@@ -84,6 +84,7 @@ export default {
   name: "BasePrincipalCard",
   data: () => ({
     location: "",
+    button: false,
     snackbar: false,
     text: "CITY NOT FOUND",
     timeout: 3000,
@@ -126,18 +127,22 @@ export default {
   },
   methods: {
     searchWeather() {
-      console.log("Clicked");
+      this.button = true;
       axios
         .get(
           "https://cors-anywhere.herokuapp.com/https://" +
             "www.metaweather.com/api/location/search/?query=" +
             this.location
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .toLowerCase()
         )
         .then((response) => {
           if (response.data.length != 0) {
             this.getWeather(response.data[0].woeid);
             return;
           }
+          this.button = false;
           this.snackbar = true;
         });
     },
@@ -150,9 +155,12 @@ export default {
         )
         .then((response) => {
           if (response.data.length != 0) {
+            console.log(response);
             this.setValuesbyResponse(response.data);
+            this.button = false;
             return;
           }
+          this.button = false;
           console.error("Woeid not found");
         });
     },
@@ -171,9 +179,39 @@ export default {
         response.consolidated_weather[0].air_pressure,
         response.consolidated_weather[0].humidity,
       ]);
+      this.setValuesTomorrow([
+        response.consolidated_weather[1].applicable_date,
+        response.consolidated_weather[1].weather_state_abbr,
+        Math.trunc(response.consolidated_weather[1].min_temp),
+        Math.trunc(response.consolidated_weather[1].max_temp),
+      ]);
+      this.setValuesSecond([
+        response.consolidated_weather[2].applicable_date,
+        response.consolidated_weather[2].weather_state_abbr,
+        Math.trunc(response.consolidated_weather[2].min_temp),
+        Math.trunc(response.consolidated_weather[2].max_temp),
+      ]);
+      this.setValuesThird([
+        response.consolidated_weather[3].applicable_date,
+        response.consolidated_weather[3].weather_state_abbr,
+        Math.trunc(response.consolidated_weather[3].min_temp),
+        Math.trunc(response.consolidated_weather[3].max_temp),
+      ]);
+      this.setValuesFourth([
+        response.consolidated_weather[4].applicable_date,
+        response.consolidated_weather[4].weather_state_abbr,
+        Math.trunc(response.consolidated_weather[4].min_temp),
+        Math.trunc(response.consolidated_weather[4].max_temp),
+      ]);
     },
 
-    ...mapMutations(["setValues"]),
+    ...mapMutations([
+      "setValues",
+      "setValuesTomorrow",
+      "setValuesSecond",
+      "setValuesThird",
+      "setValuesFourth",
+    ]),
   },
 };
 </script>
@@ -207,6 +245,6 @@ export default {
   font-size: 30px;
 }
 .text-size-xs {
-  font-size: 15px;
+  font-size: 20px;
 }
 </style>
