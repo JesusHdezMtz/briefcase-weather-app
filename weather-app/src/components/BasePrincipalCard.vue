@@ -48,7 +48,7 @@
       <p class="white--text text-size-small">{{ weather_state_name }}</p>
        <v-icon size="25"  class="mb-2 pt-10" color="grey">mdi-calendar</v-icon>
       <p class="grey--text text-size-xs">Today</p>
-      <p class="white--text text-size-small  pb-5">
+      <p class="white--text text-size-smalll  pb-5">
         <v-icon size="30"  class="mb-2" color="white">mdi-map-marker</v-icon> {{ title }}
         {{ location_type }}
       </p>
@@ -243,6 +243,9 @@ export default {
 }
 .text-size-small {
   font-size: 30px;
+}
+.text-size-smalll {
+  font-size: 25px;
 }
 .text-size-xs {
   font-size: 20px;
