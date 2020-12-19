@@ -69,7 +69,7 @@
 import { mapMutations, mapState } from "vuex";
 import axios from "axios";
 
-//icons
+//icons 
 import iconSnow from "../assets/icons/018-snowfall.svg";
 import iconSleet from "../assets/icons/045-snow.svg";
 import iconHail from "../assets/icons/013-hail.svg";
